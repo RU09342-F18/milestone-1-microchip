@@ -81,29 +81,40 @@ int main(void) {
 __interrupt void USCI0RX_ISR(void) {
     P1OUT |= BIT0;              // Turns on onboard LED when UART
                                 // message is received
-    UC0IE |= UCA0TXIE;          // Enable transmit based interrup
+    UC0IE |= UCA0TXIE;          // Enable transmit based interrupt
     char data = UCA0RXBUF;      // Stores the data that is received
                                 // in the RX buffer and clears the flags
 
-    if (counter == 0){
-        counter = data;
-        total = data;
-        if (data >= 8) {
+    if (counter == 0){          // When the initial message of total number
+                                // of bytes in package is received
+        counter = data;         // Sets initial counter value to number of
+                                // total number of bytes in package
+        total = data;           // Sets total value to number to number of
+                                // total number of bytes in package
+        if (data >= 8) {        // If another board is connected, it will
+                                // send the next board the number of packets
+                                // it can expect to receive
             UCA0TXBUF = data - 3;
         }
     } else if (total - counter == 1){
+                                // Sets the duty cycle for the red LED
         TA0CCR1 = data;
     } else if (total - counter == 2){
+                                // Sets the duty cycle for the green LED
         TA1CCR1 = data;
     } else if (total - counter == 3){
+                                // Sets the duty cycle of the blue LED
         TA1CCR2 = data;
-    } else {
-        if (total >= 8) {
+    } else {                    //
+        if (total >= 8) {       // Transmits the remainder of the bytes
             UCA0TXBUF = data;
         }
     }
 
-    counter --;
+    counter --;                 // Decrements the counter to be used to
+                                // determine which data packets are needed
+                                // to change the duty cycle and which will be
+                                // sent to the next board
     P1OUT &= ~BIT0;             // Turns off onboard LED
 }
 
