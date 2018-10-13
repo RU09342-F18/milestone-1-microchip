@@ -88,15 +88,19 @@ __interrupt void USCI0RX_ISR(void) {
     if (counter == 0){
         counter = data;
         total = data;
-        UCA0TXBUF = data - 3;
-    } else if (total - counter == 0){
-        TA0CCR1 = data;
+        if (data >= 8) {
+            UCA0TXBUF = data - 3;
+        }
     } else if (total - counter == 1){
-        TA1CCR1 = data;
+        TA0CCR1 = data;
     } else if (total - counter == 2){
+        TA1CCR1 = data;
+    } else if (total - counter == 3){
         TA1CCR2 = data;
-    } else if (counter > 0){
-        UCA0TXBUF = data;
+    } else {
+        if (total >= 8) {
+            UCA0TXBUF = data;
+        }
     }
 
     counter --;
