@@ -91,7 +91,8 @@ __interrupt void USCI0RX_ISR(void) {
                                 // total number of bytes in package
         total = data;           // Sets total value to number to number of
                                 // total number of bytes in package
-        if (data >= 8) {        // If another board is connected, it will
+        if ((total >= 8) && (((total - 2) % 3) == 0)) {
+                                // If another board is connected, it will
                                 // send the next board the number of packets
                                 // it can expect to receive
             UCA0TXBUF = data - 3;
@@ -106,7 +107,8 @@ __interrupt void USCI0RX_ISR(void) {
                                 // Sets the duty cycle of the blue LED
         TA1CCR2 = data;
     } else {                    //
-        if (total >= 8) {       // Transmits the remainder of the bytes
+        if ((total >= 8) && (((total - 2) % 3) == 0)) {
+                                // Transmits the remainder of the bytes
             UCA0TXBUF = data;
         }
     }
